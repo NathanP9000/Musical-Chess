@@ -6,3 +6,4 @@
 /stockfish_13_win_x64_avx2.exe
 node_modules
 Musical-Chess\package-lock.json
+__pycache__
