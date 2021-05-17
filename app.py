@@ -1,3 +1,4 @@
+from logging import StrFormatStyle
 import requests
 import chess.engine
 import io
@@ -42,6 +43,9 @@ def get_games_no_opponent(name, year, month):
 
     games_raw = requests.get(f"https://api.chess.com/pub/player/{name}/games/{year}/{month}")
     count =0
+    
+    wCastle = True
+    bCastle = True
     for i in range(0, len(games_raw.json()['games'])):
         if count >= 10:
             break
@@ -58,18 +62,36 @@ def get_games_no_opponent(name, year, month):
             colors = {}
             for move in game.mainline_moves():
                 #board.push(move)
-                if str(move)[0] + str(move)[1] + '-' + str(move)[2:] == 'e1-g1':
+                print(str(move))
+                if  str(move)[0] + str(move)[1] + '-' + str(move)[2:] == 'e1-g1':
+                    
                     moves_list.append(str(move)[0] + str(move)[1] + '-' + str(move)[2:])
-                    moves_list.append('h1-f1')
-                elif str(move)[0] + str(move)[1] + '-' + str(move)[2:] == 'e1-c1':
+                    
+                    if wCastle:
+                        print("1a")
+                        moves_list.append('h1-f1')
+
+                    wCastle = False
+                elif wCastle and str(move)[0] + str(move)[1] + '-' + str(move)[2:] == 'e1-c1':
                     moves_list.append(str(move)[0] + str(move)[1] + '-' + str(move)[2:])
-                    moves_list.append('a1-d1')
-                elif str(move)[0] + str(move)[1] + '-' + str(move)[2:] == 'e8-g8':
+                    
+                    if wCastle:
+                        print("2a")
+                        moves_list.append('a1-d1')
+                    wCastle = False
+                elif bCastle and str(move)[0] + str(move)[1] + '-' + str(move)[2:] == 'e8-g8':
                     moves_list.append(str(move)[0] + str(move)[1] + '-' + str(move)[2:])
-                    moves_list.append('h8-f8')
-                elif str(move)[0] + str(move)[1] + '-' + str(move)[2:] == 'e8-c8':
+                    
+                    if bCastle:
+                        print("3a")
+                        moves_list.append('h8-f8')
+                    bCastle = False
+                elif bCastle and str(move)[0] + str(move)[1] + '-' + str(move)[2:] == 'e8-c8':
                     moves_list.append(str(move)[0] + str(move)[1] + '-' + str(move)[2:])
-                    moves_list.append('a8-d8')
+                    if bCastle:
+                        print("4a")
+                        moves_list.append('a8-d8')
+                    bCastle = False
                 else:
                     moves_list.append(str(move)[0] + str(move)[1] + '-' + str(move)[2:])
                 info = engine.analyse(board, chess.engine.Limit(time=0.005))
